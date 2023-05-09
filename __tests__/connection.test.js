@@ -25,4 +25,12 @@ describe("/api/categories", () => {
 				});
 			});
 	});
+	test("GET - status 404 - Responds with an error message when an invalid path has been used", () => {
+		return request(app)
+			.get("/api/cattegories")
+			.expect(404)
+			.then((res) => {
+				expect(res.body.msg).toBe("Invalid URL");
+			});
+	});
 });
