@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
-const { getCategories } = require("./controllers");
+const { getCategories, getAPI } = require("./controllers");
 
 app.get("/api/categories", getCategories);
+
+app.get("/api", getAPI);
 
 app.use((req, res, next) => {
 	res.status(404).send({ msg: "Invalid URL" });

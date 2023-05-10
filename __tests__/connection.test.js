@@ -34,3 +34,19 @@ describe("/api/categories", () => {
 			});
 	});
 });
+
+describe("/api", () => {
+	test("GET - status 200 - Responds with an object containing information on all server endpoints", () => {
+		return request(app)
+			.get("/api")
+			.expect(200)
+			.then((res) => {
+				expect(typeof res.body).toBe("object");
+				const endpointObject = res.body.endpoints;
+				const endpointKeys = Object.keys(endpointObject);
+				expect(endpointKeys.length >= 2).toBe(true);
+				expect(endpointObject.hasOwnProperty("GET /api")).toBe(true);
+				expect(endpointObject.hasOwnProperty("GET /api/categories")).toBe(true);
+			});
+	});
+});
