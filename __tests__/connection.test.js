@@ -44,12 +44,13 @@ describe("/api", () => {
 				expect(typeof res.body).toBe("object");
 				const endpointObject = res.body.endpoints;
 				const endpointKeys = Object.keys(endpointObject);
-				expect(endpointKeys.length >= 3).toBe(true);
+				expect(endpointKeys.length >= 4).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api")).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api/categories")).toBe(true);
 				expect(
 					endpointObject.hasOwnProperty("GET /api/reviews/:review_id")
 				).toBe(true);
+				expect(endpointObject.hasOwnProperty("GET /api/reviews")).toBe(true);
 			});
 	});
 });
@@ -87,6 +88,60 @@ describe("/api/reviews/:review_id", () => {
 			.expect(404)
 			.then((res) => {
 				expect(res.body.msg).toBe("Review_id not found");
+			});
+	});
+});
+
+describe("/api/reviews", () => {
+	test("GET - status 200 - Responds with an object containing an array of all reviews", () => {
+		return request(app)
+			.get("/api/reviews")
+			.expect(200)
+			.then((res) => {
+				expect(typeof res.body).toBe("object");
+				expect(res.body.reviews.length).toBe(13);
+				res.body.reviews.forEach((review) => {
+					expect(typeof review.review_id).toBe("number");
+					expect(typeof review.title).toBe("string");
+					expect(typeof review.category).toBe("string");
+					expect(typeof review.designer).toBe("string");
+					expect(typeof review.owner).toBe("string");
+					expect(typeof review.review_img_url).toBe("string");
+					expect(typeof review.created_at).toBe("string");
+					expect(typeof review.votes).toBe("number");
+				});
+			});
+	});
+	test("GET - status 200 - Each returned review object should have it's review_body omitted", () => {
+		return request(app)
+			.get("/api/reviews")
+			.expect(200)
+			.then((res) => {
+				res.body.reviews.forEach((review) => {
+					expect(review.review_body).toBe(undefined);
+				});
+			});
+	});
+	test("GET - status 200 - The response object should be sorted by date descending", () => {
+		return request(app)
+			.get("/api/reviews")
+			.expect(200)
+			.then((res) => {
+				expect(res.body.reviews).toBeSortedBy("created_at", {
+					descending: true,
+				});
+			});
+	});
+	test("GET - status 200 - Each returned review object should have a comment_count key and value", () => {
+		return request(app)
+			.get("/api/reviews")
+			.expect(200)
+			.then((res) => {
+				res.body.reviews.forEach((review) => {
+					expect(typeof review.comment_count).toBe("number");
+				});
+				expect(res.body.reviews[0].comment_count).toBe(0);
+				expect(res.body.reviews[4].comment_count).toBe(3);
 			});
 	});
 });

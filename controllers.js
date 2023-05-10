@@ -1,4 +1,8 @@
-const { selectCategories, selectReview } = require("./models");
+const {
+	selectCategories,
+	selectReviewByID,
+	selectReviews,
+} = require("./models");
 const fs = require("fs/promises");
 
 exports.getCategories = (req, res, next) => {
@@ -22,11 +26,21 @@ exports.getAPI = (req, res, next) => {
 		});
 };
 
-exports.getReview = (req, res, next) => {
+exports.getReviewByID = (req, res, next) => {
 	const { review_id } = req.params;
-	selectReview(review_id)
+	selectReviewByID(review_id)
 		.then((review) => {
 			res.status(200).send({ review });
+		})
+		.catch((err) => {
+			next(err);
+		});
+};
+
+exports.getReviews = (req, res, next) => {
+	selectReviews()
+		.then((reviews) => {
+			res.status(200).send({ reviews });
 		})
 		.catch((err) => {
 			next(err);
