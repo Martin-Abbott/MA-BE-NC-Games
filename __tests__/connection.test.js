@@ -44,9 +44,12 @@ describe("/api", () => {
 				expect(typeof res.body).toBe("object");
 				const endpointObject = res.body.endpoints;
 				const endpointKeys = Object.keys(endpointObject);
-				expect(endpointKeys.length >= 2).toBe(true);
+				expect(endpointKeys.length >= 3).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api")).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api/categories")).toBe(true);
+				expect(
+					endpointObject.hasOwnProperty("GET /api/reviews/:review_id")
+				).toBe(true);
 			});
 	});
 });
@@ -59,7 +62,7 @@ describe("/api/reviews/:review_id", () => {
 			.then((res) => {
 				expect(typeof res.body).toBe("object");
 				expect(res.body.review.length).toBe(1);
-				expect(typeof res.body.review[0].review_id).toBe("number");
+				expect(res.body.review[0].review_id).toBe(1);
 				expect(typeof res.body.review[0].title).toBe("string");
 				expect(typeof res.body.review[0].category).toBe("string");
 				expect(typeof res.body.review[0].designer).toBe("string");
