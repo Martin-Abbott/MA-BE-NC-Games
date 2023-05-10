@@ -50,3 +50,40 @@ describe("/api", () => {
 			});
 	});
 });
+
+describe("/api/reviews/:review_id", () => {
+	test("GET - status 200 - Responds with an object containing the information for a review with the given review_id", () => {
+		return request(app)
+			.get("/api/reviews/1")
+			.expect(200)
+			.then((res) => {
+				expect(typeof res.body).toBe("object");
+				expect(res.body.review.length).toBe(1);
+				expect(typeof res.body.review[0].review_id).toBe("number");
+				expect(typeof res.body.review[0].title).toBe("string");
+				expect(typeof res.body.review[0].category).toBe("string");
+				expect(typeof res.body.review[0].designer).toBe("string");
+				expect(typeof res.body.review[0].owner).toBe("string");
+				expect(typeof res.body.review[0].review_body).toBe("string");
+				expect(typeof res.body.review[0].review_img_url).toBe("string");
+				expect(typeof res.body.review[0].created_at).toBe("string");
+				expect(typeof res.body.review[0].votes).toBe("number");
+			});
+	});
+	test("GET - status 400 - Responds with an invalid review_id error message when passed an invalid review_id", () => {
+		return request(app)
+			.get("/api/reviews/one")
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe("Invalid review_id");
+			});
+	});
+	test("GET - status 404 - Responds with an error message when passed a review_id which returns no results", () => {
+		return request(app)
+			.get("/api/reviews/1000")
+			.expect(404)
+			.then((res) => {
+				expect(res.body.msg).toBe("Review_id not found");
+			});
+	});
+});
