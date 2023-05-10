@@ -1,4 +1,4 @@
-const { selectCategories } = require("./models");
+const { selectCategories, selectReview } = require("./models");
 const fs = require("fs/promises");
 
 exports.getCategories = (req, res, next) => {
@@ -16,6 +16,17 @@ exports.getAPI = (req, res, next) => {
 		.then((endpoints) => {
 			const parsedEndpoints = JSON.parse(endpoints);
 			res.status(200).send({ endpoints: parsedEndpoints });
+		})
+		.catch((err) => {
+			next(err);
+		});
+};
+
+exports.getReview = (req, res, next) => {
+	const { review_id } = req.params;
+	selectReview(review_id)
+		.then((review) => {
+			res.status(200).send({ review });
 		})
 		.catch((err) => {
 			next(err);
