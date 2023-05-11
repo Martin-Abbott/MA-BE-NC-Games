@@ -44,7 +44,7 @@ describe("/api", () => {
 				expect(typeof res.body).toBe("object");
 				const endpointObject = res.body.endpoints;
 				const endpointKeys = Object.keys(endpointObject);
-				expect(endpointKeys.length >= 5).toBe(true);
+				expect(endpointKeys.length === 5).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api")).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api/categories")).toBe(true);
 				expect(
@@ -184,9 +184,9 @@ describe("/api/reviews/:review_id/comments", () => {
 			.expect(200)
 			.then((res) => {
 				expect(typeof res.body).toBe("object");
-				// expect(Array.isArray(res.body.comments)).toBe(true);
-				// expect(res.body.comments).toEqual([]);
-				// expect(res.body.comments.length).toBe(0);
+				expect(Array.isArray(res.body.comments)).toBe(true);
+				expect(res.body.comments).toEqual([]);
+				expect(res.body.comments.length).toBe(0);
 			});
 	});
 	test("GET - status 400 - Responds with an invalid review_id error message when passed an invalid review_id", () => {
