@@ -44,13 +44,16 @@ describe("/api", () => {
 				expect(typeof res.body).toBe("object");
 				const endpointObject = res.body.endpoints;
 				const endpointKeys = Object.keys(endpointObject);
-				expect(endpointKeys.length >= 4).toBe(true);
+				expect(endpointKeys.length === 5).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api")).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api/categories")).toBe(true);
 				expect(
 					endpointObject.hasOwnProperty("GET /api/reviews/:review_id")
 				).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api/reviews")).toBe(true);
+				expect(
+					endpointObject.hasOwnProperty("GET /api/reviews/:review_id/comments")
+				).toBe(true);
 			});
 	});
 });
@@ -142,6 +145,64 @@ describe("/api/reviews", () => {
 				});
 				expect(res.body.reviews[0].comment_count).toBe(0);
 				expect(res.body.reviews[4].comment_count).toBe(3);
+			});
+	});
+});
+
+describe("/api/reviews/:review_id/comments", () => {
+	test("GET - status 200 - Responds with an object containing all comments which match a given review_id", () => {
+		return request(app)
+			.get("/api/reviews/2/comments")
+			.expect(200)
+			.then((res) => {
+				expect(typeof res.body).toBe("object");
+				expect(res.body.comments.length).toBe(3);
+				res.body.comments.forEach((comment) => {
+					expect(typeof comment.comment_id).toBe("number");
+					expect(typeof comment.body).toBe("string");
+					expect(typeof comment.votes).toBe("number");
+					expect(typeof comment.author).toBe("string");
+					expect(typeof comment.review_id).toBe("number");
+					expect(typeof comment.created_at).toBe("string");
+					expect(comment.review_id).toBe(2);
+				});
+			});
+	});
+	test("GET - status 200 - The response object should be sorted by date descending", () => {
+		return request(app)
+			.get("/api/reviews/2/comments")
+			.expect(200)
+			.then((res) => {
+				expect(res.body.comments).toBeSortedBy("created_at", {
+					descending: true,
+				});
+			});
+	});
+	test("GET - status 200 - The response object should be empty when passed a valid review_id which has no comments associated with it", () => {
+		return request(app)
+			.get("/api/reviews/1/comments")
+			.expect(200)
+			.then((res) => {
+				expect(typeof res.body).toBe("object");
+				expect(Array.isArray(res.body.comments)).toBe(true);
+				expect(res.body.comments).toEqual([]);
+				expect(res.body.comments.length).toBe(0);
+			});
+	});
+	test("GET - status 400 - Responds with an invalid review_id error message when passed an invalid review_id", () => {
+		return request(app)
+			.get("/api/reviews/one/comments")
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe("Invalid review_id");
+			});
+	});
+	test("GET - status 404 - Responds with an error message when passed a review_id which returns no results", () => {
+		return request(app)
+			.get("/api/reviews/1000/comments")
+			.expect(404)
+			.then((res) => {
+				expect(res.body.msg).toBe("Review_id not found");
 			});
 	});
 });
