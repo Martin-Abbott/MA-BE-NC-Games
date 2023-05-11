@@ -41,6 +41,7 @@
 		"exampleResponse": {
 			"reviews": [
 				{
+					"review_id": 8,
 					"title": "One Night Ultimate Werewolf",
 					"designer": "Akihisa Okui",
 					"owner": "happyamy2016",
