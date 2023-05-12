@@ -82,16 +82,11 @@ exports.postComment = (req, res, next) => {
 exports.modifyReviewVotes = (req, res, next) => {
 	const { review_id } = req.params;
 	const { inc_votes } = req.body;
-	console.log(inc_votes, Number.isInteger(inc_votes));
 	if (inc_votes === undefined || inc_votes === {}) {
 		selectReviewByID(review_id).then((review) => {
 			res.status(200).send({ review });
 		});
-	}
-	// else if (Number.isInteger(inc_votes) === false) {
-	// 	res.status(400).send;
-	// }
-	else {
+	} else {
 		editReviewVotes(review_id, inc_votes)
 			.then((review) => {
 				res.status(200).send({ review });
