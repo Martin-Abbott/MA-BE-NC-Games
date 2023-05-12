@@ -1,5 +1,5 @@
 const connection = require("./db/connection");
-const { checkReviewIdExists, checkUsernameExists } = require("./query-utils");
+const { checkReviewIdExists } = require("./query-utils");
 
 exports.selectCategories = () => {
 	return connection.query("SELECT * FROM categories;").then((res) => {
@@ -53,16 +53,14 @@ exports.createComment = (username, body, review_id) => {
 	const createCommentValues = [username, body, review_id];
 	const createCommentQuery = `INSERT INTO comments (author, body, review_id) VALUES ($1, $2, $3) RETURNING *;`;
 	const checkReviewIdExistsPromise = checkReviewIdExists(review_id);
-	const checkUsernameExistsPromise = checkUsernameExists(username);
 	const createCommentQueryPromise = connection.query(
 		createCommentQuery,
 		createCommentValues
 	);
 	return Promise.all([
 		checkReviewIdExistsPromise,
-		checkUsernameExistsPromise,
 		createCommentQueryPromise,
 	]).then((res) => {
-		return res[2].rows;
+		return res[1].rows;
 	});
 };
