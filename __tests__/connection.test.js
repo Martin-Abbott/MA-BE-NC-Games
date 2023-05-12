@@ -44,7 +44,7 @@ describe("/api", () => {
 				expect(typeof res.body).toBe("object");
 				const endpointObject = res.body.endpoints;
 				const endpointKeys = Object.keys(endpointObject);
-				expect(endpointKeys.length === 5).toBe(true);
+				expect(endpointKeys.length === 6).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api")).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api/categories")).toBe(true);
 				expect(
@@ -53,6 +53,9 @@ describe("/api", () => {
 				expect(endpointObject.hasOwnProperty("GET /api/reviews")).toBe(true);
 				expect(
 					endpointObject.hasOwnProperty("GET /api/reviews/:review_id/comments")
+				).toBe(true);
+				expect(
+					endpointObject.hasOwnProperty("POST /api/reviews/:review_id/comments")
 				).toBe(true);
 			});
 	});
@@ -203,6 +206,103 @@ describe("/api/reviews/:review_id/comments", () => {
 			.expect(404)
 			.then((res) => {
 				expect(res.body.msg).toBe("Review_id not found");
+			});
+	});
+	test("POST - status 201 - Responds with the newly posted comment", () => {
+		const newComment = {
+			username: "bainesface",
+			body: "Test comment",
+		};
+		return request(app)
+			.post("/api/reviews/1/comments")
+			.send(newComment)
+			.expect(201)
+			.then((res) => {
+				const { comment } = res.body;
+				expect(typeof comment).toBe("object");
+				expect(comment[0].comment_id).toBe(7);
+				expect(comment[0].body).toBe("Test comment");
+				expect(comment[0].votes).toBe(0);
+				expect(comment[0].author).toBe("bainesface");
+				expect(comment[0].review_id).toBe(1);
+				expect(comment[0].created_at).not.toBe(undefined);
+			});
+	});
+	test("POST - status 400 - Responds with 'Comment body and username are both required' when body is not provided", () => {
+		const badComment1 = {
+			username: "bainesface",
+		};
+		return request(app)
+			.post("/api/reviews/1/comments")
+			.send(badComment1)
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe(
+					"Comment body and username are both required"
+				);
+			});
+	});
+	test("POST - status 400 - Responds with 'Comment body and username are both required' when username is not provided", () => {
+		const badComment2 = {
+			body: "Bad comment",
+		};
+		return request(app)
+			.post("/api/reviews/1/comments")
+			.send(badComment2)
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe(
+					"Comment body and username are both required"
+				);
+			});
+	});
+	test("POST - status 400 - Responds with 'Comment body and username are both required' when neither of these is provided", () => {
+		const badComment3 = {};
+		return request(app)
+			.post("/api/reviews/1/comments")
+			.send(badComment3)
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe(
+					"Comment body and username are both required"
+				);
+			});
+	});
+	test("POST - status 400 - Responds with an error message when passed an invalid review_id", () => {
+		const newComment = {
+			username: "bainesface",
+			body: "Test comment",
+		};
+		return request(app)
+			.post("/api/reviews/one/comments")
+			.send(newComment)
+			.expect(400)
+			.then((res) => expect(res.body.msg).toBe("Invalid review_id"));
+	});
+	test("POST - status 404 - Responds with an error message when passed a potentially valid review_id which doesn't exist", () => {
+		const newComment = {
+			username: "bainesface",
+			body: "Test comment",
+		};
+		return request(app)
+			.post("/api/reviews/1000/comments")
+			.send(newComment)
+			.expect(404)
+			.then((res) => {
+				expect(res.body.msg).toBe("Review_id not found");
+			});
+	});
+	test("POST - status 404 - Responds with an error message when passed a username which doesn't exist", () => {
+		const newComment = {
+			username: "fake-user",
+			body: "Test comment",
+		};
+		return request(app)
+			.post("/api/reviews/1/comments")
+			.send(newComment)
+			.expect(404)
+			.then((res) => {
+				expect(res.body.msg).toBe("Username not found");
 			});
 	});
 });

@@ -6,7 +6,10 @@ const {
 	getReviewByID,
 	getReviews,
 	getCommentsByReviewID,
+	postComment,
 } = require("./controllers");
+
+app.use(express.json());
 
 app.get("/api/categories", getCategories);
 
@@ -17,6 +20,8 @@ app.get("/api/reviews/:review_id", getReviewByID);
 app.get("/api/reviews", getReviews);
 
 app.get("/api/reviews/:review_id/comments", getCommentsByReviewID);
+
+app.post("/api/reviews/:review_id/comments", postComment);
 
 app.use((req, res, next) => {
 	res.status(404).send({ msg: "Invalid URL" });
