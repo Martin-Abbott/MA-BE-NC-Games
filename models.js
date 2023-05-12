@@ -64,3 +64,22 @@ exports.createComment = (username, body, review_id) => {
 		return res[1].rows;
 	});
 };
+
+exports.editReviewVotes = (review_id, inc_votes) => {
+	const editReviewValues = [review_id, inc_votes];
+	const editReviewQuery = `
+	UPDATE reviews
+	SET votes = votes + $2
+	WHERE review_id = $1
+	RETURNING *;`;
+	const checkReviewIdExistsPromise = checkReviewIdExists(review_id);
+	const editReviewQueryPromise = connection.query(
+		editReviewQuery,
+		editReviewValues
+	);
+	return Promise.all([checkReviewIdExistsPromise, editReviewQueryPromise]).then(
+		(res) => {
+			return res[1].rows;
+		}
+	);
+};
