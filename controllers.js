@@ -4,6 +4,7 @@ const {
 	selectReviews,
 	selectCommentsByReviewID,
 	createComment,
+	editReviewVotes,
 } = require("./models");
 const fs = require("fs/promises");
 
@@ -71,6 +72,22 @@ exports.postComment = (req, res, next) => {
 		createComment(username, body, review_id)
 			.then((comment) => {
 				res.status(201).send({ comment });
+			})
+			.catch((err) => {
+				next(err);
+			});
+	}
+};
+
+exports.modifyReviewVotes = (req, res, next) => {
+	const { review_id } = req.params;
+	const { inc_votes } = req.body;
+	if (!inc_votes) {
+		res.status(400).send({ msg: "inc_votes is required" });
+	} else {
+		editReviewVotes(review_id, inc_votes)
+			.then((review) => {
+				res.status(200).send({ review });
 			})
 			.catch((err) => {
 				next(err);

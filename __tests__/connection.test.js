@@ -44,7 +44,7 @@ describe("/api", () => {
 				expect(typeof res.body).toBe("object");
 				const endpointObject = res.body.endpoints;
 				const endpointKeys = Object.keys(endpointObject);
-				expect(endpointKeys.length === 6).toBe(true);
+				expect(endpointKeys.length).toBe(7);
 				expect(endpointObject.hasOwnProperty("GET /api")).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api/categories")).toBe(true);
 				expect(
@@ -56,6 +56,9 @@ describe("/api", () => {
 				).toBe(true);
 				expect(
 					endpointObject.hasOwnProperty("POST /api/reviews/:review_id/comments")
+				).toBe(true);
+				expect(
+					endpointObject.hasOwnProperty("PATCH /api/reviews/:review_id")
 				).toBe(true);
 			});
 	});
@@ -94,6 +97,57 @@ describe("/api/reviews/:review_id", () => {
 			.expect(404)
 			.then((res) => {
 				expect(res.body.msg).toBe("Review_id not found");
+			});
+	});
+	test("PATCH - status 200 - Responds with an updated review object when passed a valid review_id and a valid inc_votes object", () => {
+		const incVotesObj = { inc_votes: 10 };
+		return request(app)
+			.patch("/api/reviews/1")
+			.send(incVotesObj)
+			.expect(200)
+			.then((res) => {
+				expect(typeof res.body).toBe("object");
+				const review = res.body.review;
+				expect(review.length).toBe(1);
+				expect(typeof review[0].review_id).toBe("number");
+				expect(typeof review[0].title).toBe("string");
+				expect(typeof review[0].category).toBe("string");
+				expect(typeof review[0].designer).toBe("string");
+				expect(typeof review[0].owner).toBe("string");
+				expect(typeof review[0].review_img_url).toBe("string");
+				expect(typeof review[0].created_at).toBe("string");
+				expect(typeof review[0].votes).toBe("number");
+				expect(review[0].votes).toBe(11);
+			});
+	});
+	test("PATCH - status 400 - Responds with an invalid review_id error message when passed an invalid review_id", () => {
+		const incVotesObj = { inc_votes: 10 };
+		return request(app)
+			.patch("/api/reviews/one")
+			.send(incVotesObj)
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe("Invalid review_id");
+			});
+	});
+	test("PATCH - status 404 - Responds with an error message when passed a review_id which returns no results", () => {
+		const incVotesObj = { inc_votes: 10 };
+		return request(app)
+			.patch("/api/reviews/1000")
+			.send(incVotesObj)
+			.expect(404)
+			.then((res) => {
+				expect(res.body.msg).toBe("Review_id not found");
+			});
+	});
+	test("PATCH - status 400 - Responds with an inc_votes is required error message when passed an empty inc_votes object", () => {
+		const incVotesObj = {};
+		return request(app)
+			.patch("/api/reviews/1")
+			.send(incVotesObj)
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe("inc_votes is required");
 			});
 	});
 });
