@@ -48,3 +48,19 @@ exports.selectCommentsByReviewID = (reviewID) => {
 		return res[1].rows;
 	});
 };
+
+exports.createComment = (username, body, review_id) => {
+	const createCommentValues = [username, body, review_id];
+	const createCommentQuery = `INSERT INTO comments (author, body, review_id) VALUES ($1, $2, $3) RETURNING *;`;
+	const checkReviewIdExistsPromise = checkReviewIdExists(review_id);
+	const createCommentQueryPromise = connection.query(
+		createCommentQuery,
+		createCommentValues
+	);
+	return Promise.all([
+		checkReviewIdExistsPromise,
+		createCommentQueryPromise,
+	]).then((res) => {
+		return res[1].rows;
+	});
+};

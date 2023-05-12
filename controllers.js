@@ -3,6 +3,7 @@ const {
 	selectReviewByID,
 	selectReviews,
 	selectCommentsByReviewID,
+	createComment,
 } = require("./models");
 const fs = require("fs/promises");
 
@@ -57,4 +58,22 @@ exports.getCommentsByReviewID = (req, res, next) => {
 		.catch((err) => {
 			next(err);
 		});
+};
+
+exports.postComment = (req, res, next) => {
+	const { review_id } = req.params;
+	const { username, body } = req.body;
+	if (!username || !body) {
+		res
+			.status(400)
+			.send({ msg: "Comment body and username are both required" });
+	} else {
+		createComment(username, body, review_id)
+			.then((comment) => {
+				res.status(201).send({ comment });
+			})
+			.catch((err) => {
+				next(err);
+			});
+	}
 };

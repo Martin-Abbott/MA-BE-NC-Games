@@ -6,7 +6,10 @@ const {
 	getReviewByID,
 	getReviews,
 	getCommentsByReviewID,
+	postComment,
 } = require("./controllers");
+
+app.use(express.json());
 
 app.get("/api/categories", getCategories);
 
@@ -18,6 +21,8 @@ app.get("/api/reviews", getReviews);
 
 app.get("/api/reviews/:review_id/comments", getCommentsByReviewID);
 
+app.post("/api/reviews/:review_id/comments", postComment);
+
 app.use((req, res, next) => {
 	res.status(404).send({ msg: "Invalid URL" });
 });
@@ -27,6 +32,8 @@ app.use((err, req, res, next) => {
 		res.status(err.status).send({ msg: err.msg });
 	} else if (err.code === "22P02") {
 		res.status(400).send({ msg: "Invalid review_id" });
+	} else if (err.code === "23503") {
+		res.status(404).send({ msg: "Username not found" });
 	} else {
 		res.status(500).send({ msg: "Server Error" });
 	}
