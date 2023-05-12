@@ -120,6 +120,27 @@ describe("/api/reviews/:review_id", () => {
 				expect(review[0].votes).toBe(11);
 			});
 	});
+	test("PATCH - status 200 - Responds with an updated review object when passed a valid review_id and a valid inc_votes object", () => {
+		const incVotesObj = { inc_votes: -11 };
+		return request(app)
+			.patch("/api/reviews/1")
+			.send(incVotesObj)
+			.expect(200)
+			.then((res) => {
+				expect(typeof res.body).toBe("object");
+				const review = res.body.review;
+				expect(review.length).toBe(1);
+				expect(typeof review[0].review_id).toBe("number");
+				expect(typeof review[0].title).toBe("string");
+				expect(typeof review[0].category).toBe("string");
+				expect(typeof review[0].designer).toBe("string");
+				expect(typeof review[0].owner).toBe("string");
+				expect(typeof review[0].review_img_url).toBe("string");
+				expect(typeof review[0].created_at).toBe("string");
+				expect(typeof review[0].votes).toBe("number");
+				expect(review[0].votes).toBe(-10);
+			});
+	});
 	test("PATCH - status 400 - Responds with an invalid review_id error message when passed an invalid review_id", () => {
 		const incVotesObj = { inc_votes: 10 };
 		return request(app)
