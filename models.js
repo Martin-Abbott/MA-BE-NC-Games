@@ -21,15 +21,24 @@ exports.selectReviewByID = (reviewID) => {
 	});
 };
 
-exports.selectReviews = () => {
-	const selectReviewsQuery = `
+exports.selectReviews = (category) => {
+	console.log(category, "Category in models");
+	const queryValues = [];
+
+	let selectReviewsQuery = `
 	SELECT 
 	reviews.review_id, reviews.title, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes, 
-	COUNT(comments.comment_id)::INTEGER AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id 
-	GROUP BY reviews.review_id, reviews.title, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes
-	ORDER BY reviews.created_at DESC;
-	`;
-	return connection.query(selectReviewsQuery).then((res) => {
+	COUNT(comments.comment_id)::INTEGER AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id`;
+
+	if (category) {
+		selectReviewsQuery += ` WHERE reviews.category = $1`;
+		queryValues.push(category);
+	}
+
+	selectReviewsQuery += ` GROUP BY reviews.review_id
+	ORDER BY reviews.created_at DESC;`;
+
+	return connection.query(selectReviewsQuery, queryValues).then((res) => {
 		return res.rows;
 	});
 };

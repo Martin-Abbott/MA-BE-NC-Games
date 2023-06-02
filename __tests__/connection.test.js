@@ -246,6 +246,35 @@ describe("/api/reviews", () => {
 				expect(res.body.reviews[4].comment_count).toBe(3);
 			});
 	});
+	test("GET - status 200 - Responds with an object containing an array of all reviews, filtered by the given category", () => {
+		return request(app)
+			.get("/api/reviews?category=dexterity")
+			.expect(200)
+			.then((res) => {
+				expect(typeof res.body).toBe("object");
+				expect(res.body.reviews.length).toBe(1);
+				res.body.reviews.forEach((review) => {
+					expect(review.category).toBe("dexterity");
+					expect(typeof review.review_id).toBe("number");
+					expect(typeof review.title).toBe("string");
+					expect(typeof review.category).toBe("string");
+					expect(typeof review.designer).toBe("string");
+					expect(typeof review.owner).toBe("string");
+					expect(typeof review.review_img_url).toBe("string");
+					expect(typeof review.created_at).toBe("string");
+					expect(typeof review.votes).toBe("number");
+				});
+			});
+	});
+	test("GET - status 200 - When passed a non-existent category, responds with an object containing an empty array of reviews", () => {
+		return request(app)
+			.get("/api/reviews?category=fake")
+			.expect(200)
+			.then((res) => {
+				console.log(res.body);
+				expect(typeof res.body).toBe("object");
+			});
+	});
 });
 
 describe("/api/reviews/:review_id/comments", () => {

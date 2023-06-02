@@ -41,7 +41,9 @@ exports.getReviewByID = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-	selectReviews()
+	const { category } = req.query;
+	// console.log(category, "Category in controllers");
+	selectReviews(category)
 		.then((reviews) => {
 			res.status(200).send({ reviews });
 		})
