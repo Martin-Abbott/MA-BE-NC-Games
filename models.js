@@ -22,7 +22,6 @@ exports.selectReviewByID = (reviewID) => {
 };
 
 exports.selectReviews = (category) => {
-	console.log(category, "Category in models");
 	const queryValues = [];
 
 	let selectReviewsQuery = `
