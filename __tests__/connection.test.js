@@ -271,8 +271,63 @@ describe("/api/reviews", () => {
 			.get("/api/reviews?category=fake")
 			.expect(200)
 			.then((res) => {
-				console.log(res.body);
 				expect(typeof res.body).toBe("object");
+			});
+	});
+	test("GET - status 200 - Responds with an object containing an array of all reviews, sorted by date (default) and ordered descending (default)", () => {
+		return request(app)
+			.get("/api/reviews")
+			.expect(200)
+			.then((res) => {
+				expect(res.body.reviews).toBeSortedBy("created_at", {
+					descending: true,
+				});
+			});
+	});
+	test("GET - status 200 - Responds with an object containing an array of all reviews, sorted by date (default) and ordered ascending", () => {
+		return request(app)
+			.get("/api/reviews?order_by=asc")
+			.expect(200)
+			.then((res) => {
+				expect(res.body.reviews).toBeSortedBy("created_at", {
+					descending: false,
+				});
+			});
+	});
+	test("GET - status 200 - Responds with an object containing an array of all reviews, sorted by title and ordered descending (default)", () => {
+		return request(app)
+			.get("/api/reviews?sort_by=title")
+			.expect(200)
+			.then((res) => {
+				expect(res.body.reviews).toBeSortedBy("title", {
+					descending: true,
+				});
+			});
+	});
+	test("GET - status 200 - Responds with an object containing an array of all reviews, sorted by title and ordered ascending", () => {
+		return request(app)
+			.get("/api/reviews?sort_by=votes&&order_by=asc")
+			.expect(200)
+			.then((res) => {
+				expect(res.body.reviews).toBeSortedBy("votes", {
+					descending: false,
+				});
+			});
+	});
+	test("GET - status 400 - Responds with an error message when passed an invalid sort_by query", () => {
+		return request(app)
+			.get("/api/reviews?sort_by=title&&order_by=up")
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe("Invalid sort order query");
+			});
+	});
+	test("GET - status 400 - Responds with an error message when passed an invalid order_by query", () => {
+		return request(app)
+			.get("/api/reviews?sort_by=something&&order_by=asc")
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe("Invalid order by query");
 			});
 	});
 });
