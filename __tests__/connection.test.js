@@ -44,7 +44,7 @@ describe("/api", () => {
 				expect(typeof res.body).toBe("object");
 				const endpointObject = res.body.endpoints;
 				const endpointKeys = Object.keys(endpointObject);
-				expect(endpointKeys.length).toBe(7);
+				expect(endpointKeys.length).toBe(8);
 				expect(endpointObject.hasOwnProperty("GET /api")).toBe(true);
 				expect(endpointObject.hasOwnProperty("GET /api/categories")).toBe(true);
 				expect(
@@ -59,6 +59,9 @@ describe("/api", () => {
 				).toBe(true);
 				expect(
 					endpointObject.hasOwnProperty("PATCH /api/reviews/:review_id")
+				).toBe(true);
+				expect(
+					endpointObject.hasOwnProperty("DELETE /api/comments/:comment_id")
 				).toBe(true);
 			});
 	});
@@ -483,6 +486,33 @@ describe("/api/reviews/:review_id/comments", () => {
 			.expect(404)
 			.then((res) => {
 				expect(res.body.msg).toBe("Username not found");
+			});
+	});
+});
+
+describe("/api/comments/:comment_id", () => {
+	test("DELETE - status 204 - responds with status 204 and no response data", () => {
+		return request(app)
+			.delete("/api/comments/1")
+			.expect(204)
+			.then((res) => {
+				expect(res.data).toBe(undefined);
+			});
+	});
+	test("DELETE - status 400 - responds with an error message when passed an invalid id", () => {
+		return request(app)
+			.delete("/api/comments/something")
+			.expect(400)
+			.then((res) => {
+				expect(res.body.msg).toBe("Invalid request");
+			});
+	});
+	test("DELETE - status 400 - responds with an error message when passed an id that does not exist", () => {
+		return request(app)
+			.delete("/api/comments/1000")
+			.expect(404)
+			.then((res) => {
+				expect(res.body.msg).toBe("Comment ID 1000 not found");
 			});
 	});
 });
