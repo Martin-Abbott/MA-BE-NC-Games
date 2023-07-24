@@ -5,6 +5,7 @@ const {
 	selectCommentsByReviewID,
 	createComment,
 	editReviewVotes,
+	deleteCommentById,
 } = require("./models");
 const fs = require("fs/promises");
 
@@ -96,4 +97,13 @@ exports.modifyReviewVotes = (req, res, next) => {
 				next(err);
 			});
 	}
+};
+
+exports.removeCommentById = (req, res, next) => {
+	const { comment_id } = req.params;
+	deleteCommentById(comment_id)
+		.then(() => res.status(204).send())
+		.catch((err) => {
+			next(err);
+		});
 };

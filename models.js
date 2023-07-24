@@ -124,3 +124,17 @@ exports.editReviewVotes = (review_id, inc_votes) => {
 		}
 	);
 };
+
+exports.deleteCommentById = (comment_id) => {
+	const deleteCommentQuery = "DELETE FROM comments WHERE comment_id = $1;";
+	return connection
+		.query(deleteCommentQuery, [comment_id])
+		.then(({ rowCount }) => {
+			if (rowCount === 0) {
+				return Promise.reject({
+					status: 404,
+					msg: `Comment ID ${comment_id} not found`,
+				});
+			}
+		});
+};

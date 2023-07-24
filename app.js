@@ -8,6 +8,7 @@ const {
 	getCommentsByReviewID,
 	postComment,
 	modifyReviewVotes,
+	removeCommentById,
 } = require("./controllers");
 const cors = require("cors");
 
@@ -28,6 +29,8 @@ app.get("/api/reviews/:review_id/comments", getCommentsByReviewID);
 app.post("/api/reviews/:review_id/comments", postComment);
 
 app.patch("/api/reviews/:review_id", modifyReviewVotes);
+
+app.delete("/api/comments/:comment_id", removeCommentById);
 
 app.use((req, res, next) => {
 	res.status(404).send({ msg: "Invalid URL" });

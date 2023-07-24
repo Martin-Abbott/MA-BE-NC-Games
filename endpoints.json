@@ -1,9 +1,10 @@
 {
 	"GET /api": {
-		"description": "serves up a json representation of all the available endpoints of the api"
+		"description": "Serves up a JSON representation of all the available endpoints of the API"
 	},
+
 	"GET /api/categories": {
-		"description": "serves an array of all categories",
+		"description": "Serves an array of all categories",
 		"queries": [],
 		"exampleResponse": {
 			"categories": [
@@ -16,7 +17,7 @@
 	},
 
 	"GET /api/reviews/:review_id": {
-		"description": "serves an array containing a given review_id",
+		"description": "Serves an array containing a given review_id",
 		"queries": ["review_id"],
 		"exampleResponse": {
 			"review": [
@@ -36,7 +37,7 @@
 	},
 
 	"GET /api/reviews": {
-		"description": "serves an array of all reviews",
+		"description": "Serves an array of all reviews",
 		"queries": ["category", "sort_by", "order"],
 		"exampleResponse": {
 			"reviews": [
@@ -56,7 +57,7 @@
 	},
 
 	"GET /api/reviews/:review_id/comments": {
-		"description": "serves an array of all comments which match a given review_id",
+		"description": "Serves an array of all comments which match a given review_id",
 		"queries": ["review_id"],
 		"exampleResponse": {
 			"comments": [
@@ -105,5 +106,10 @@
 				}
 			]
 		}
+	},
+
+	"DELETE /api/comments/:comment_id": {
+		"description": "Deletes a comment when passed a valid comment_id",
+		"exampleResponse": {}
 	}
 }
