@@ -21,7 +21,19 @@ exports.selectReviewByID = (reviewID) => {
 	});
 };
 
-exports.selectReviews = (category) => {
+exports.selectReviews = (category, order, sortBy) => {
+	const sortList = [
+		"review_id",
+		"title",
+		"category",
+		"designer",
+		"owner",
+		"review_img_url",
+		"created_at",
+		"votes",
+		"comment_count",
+	];
+	const orderList = ["ASC", "DESC"];
 	const queryValues = [];
 
 	let selectReviewsQuery = `
@@ -34,8 +46,29 @@ exports.selectReviews = (category) => {
 		queryValues.push(category);
 	}
 
-	selectReviewsQuery += ` GROUP BY reviews.review_id
-	ORDER BY reviews.created_at DESC;`;
+	selectReviewsQuery += ` GROUP BY reviews.review_id`;
+
+	if (sortBy) {
+		const sortIndex = sortList.indexOf(sortBy);
+		if (sortIndex !== -1) {
+			selectReviewsQuery += ` ORDER BY ${sortList[sortIndex]}`;
+		} else {
+			return Promise.reject({ status: 400, msg: "Invalid order by query" });
+		}
+	} else {
+		selectReviewsQuery += " ORDER BY reviews.created_at";
+	}
+
+	if (order) {
+		const orderIndex = orderList.indexOf(order.toUpperCase());
+		if (orderIndex !== -1) {
+			selectReviewsQuery += ` ${orderList[orderIndex]}`;
+		} else {
+			return Promise.reject({ status: 400, msg: "Invalid sort order query" });
+		}
+	} else {
+		selectReviewsQuery += " DESC;";
+	}
 
 	return connection.query(selectReviewsQuery, queryValues).then((res) => {
 		return res.rows;
